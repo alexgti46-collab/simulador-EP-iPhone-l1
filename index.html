@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><meta name="theme-color" content="#10243a"><title>Simulador de escoria · v2.3</title>
+<style>
+:root{color-scheme:light;--navy:#10243a;--blue:#176b87;--cyan:#dff3f6;--bg:#f3f6f8;--card:#fff;--ink:#172b3a;--muted:#637786;--line:#dce5ea;--gold:#f4b942;--green:#18794e;--warn:#946200;--red:#a93243}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px system-ui,-apple-system,Segoe UI,sans-serif}header{background:linear-gradient(120deg,#10243a,#176b87);color:white;padding:18px 16px 15px}h1{font-size:20px;margin:0 0 4px}header p{font-size:12px;margin:0;color:#d9eaf0}.wrap{max-width:850px;margin:auto;padding:12px 12px 30px}.tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;background:#e4ebef;padding:5px;border-radius:13px;position:sticky;top:0;z-index:5}.tab{border:0;background:transparent;color:#526675;padding:10px 3px;border-radius:9px;font-size:12px;font-weight:700}.tab.active{background:white;color:var(--blue);box-shadow:0 1px 5px #10243a1a}.pane{display:none;padding-top:12px}.pane.active{display:block}.card{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:15px;margin-bottom:12px;box-shadow:0 2px 8px #19384b08}.card h2{font-size:16px;margin:0 0 5px}.muted{font-size:12px;color:var(--muted);line-height:1.5}.field{display:grid;grid-template-columns:1fr 115px;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid #edf1f3}.field:last-child{border:0}.field label{font-weight:650}.field small{display:block;color:var(--muted);font-weight:400;font-size:11px}.field input,.scenario-grid input,.meta input,.meta select{width:100%;padding:11px;border:1px solid #cbd8df;border-radius:9px;background:#fbfdfe;color:var(--ink);font-size:16px;min-width:0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.metric{background:#f7fafb;border:1px solid var(--line);border-radius:12px;padding:12px;min-width:0}.metric span{display:block;color:var(--muted);font-size:11px}.metric strong{display:block;font-size:20px;margin-top:4px;overflow-wrap:anywhere}.metric em{font-style:normal;font-size:10px;color:var(--muted)}.pill{display:inline-block;border-radius:30px;padding:5px 9px;background:var(--cyan);color:var(--blue);font-size:11px;font-weight:700}.notice{border-radius:11px;padding:11px 12px;font-size:12px;line-height:1.5;margin-top:10px;background:#fff8e8;border:1px solid #f0dba9;color:#634a14}.notice.info{background:#eef7fa;border-color:#cce4ec;color:#24566b}.notice.danger{background:#fff0f1;border-color:#f1c6cc;color:#812c39}.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}button.action{border:0;border-radius:10px;padding:11px 14px;background:var(--blue);color:white;font-weight:700;font-size:13px}button.secondary{background:#eaf1f4;color:#24485a}.meta{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}.meta label,.scenario-grid label{font-size:11px;color:var(--muted);font-weight:650}.meta input,.meta select{display:block;margin-top:5px;font-size:14px}.scenario-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.scenario-grid input{display:block;margin-top:5px}.table-wrap{overflow:auto}table{border-collapse:collapse;width:100%;font-size:12px;min-width:520px}th,td{text-align:left;padding:9px 7px;border-bottom:1px solid var(--line)}th{color:var(--muted)}canvas{width:100%;height:220px;background:#fbfdfe;border:1px solid var(--line);border-radius:10px}.empty{padding:20px;text-align:center;color:var(--muted);font-size:13px}.subhead{margin:13px 0 5px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--blue);font-weight:800}
+@media(max-width:390px){.tab{font-size:10px;padding:9px 1px}.field{grid-template-columns:1fr 100px}.metric strong{font-size:18px}}
+
+#splash{position:fixed;inset:0;z-index:9999;background:#06111e;display:flex;align-items:center;justify-content:center}
+#splash img{width:100%;height:100%;object-fit:contain}
+#splash.hide{opacity:0;visibility:hidden;transition:opacity .18s ease,visibility .18s}
+</style>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Simulador Escoria">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));}</script>
+</head><body>
+<div id="splash"><img src="splash.jpg" alt="EPI Simulador"></div>
+
+<header><h1>🔥 Simulador de química de escoria</h1><p>Versión 2.3 · Horno eléctrico de ferroníquel · Herramienta de análisis y seguimiento</p></header>
+<div class="wrap">
+<nav class="tabs"><button class="tab active" data-tab="chem">Química</button><button class="tab" data-tab="props">Propiedades</button><button class="tab" data-tab="energy">Energía</button><button class="tab" data-tab="trend">Tendencias</button><button class="tab" data-tab="whatif">¿Qué pasaría?</button></nav>
+<section class="pane active" id="chem">
+ <div class="card"><h2>Química de escoria</h2><p class="muted">Ingresa los resultados del laboratorio en porcentaje en masa. Se mantienen únicamente los cinco componentes que solicitaste.</p>
+  <div id="chemFields"></div>
+  <div class="metric" style="margin-top:12px"><span>Relación SiO₂ / MgO</span><strong id="ratio">—</strong><em>Calculada automáticamente</em></div>
+  <div class="notice info">La relación SiO₂/MgO se calcula con los porcentajes ingresados. No se suman los componentes como si fueran todos óxidos equivalentes.</div>
+  <div class="btns"><button class="action" onclick="resetChem()">Restaurar ejemplo</button><button class="action secondary" onclick="shareCurrent()">Compartir análisis</button></div>
+ </div>
+ <div class="card"><h2>Guardar muestra</h2><p class="muted">Registra cada análisis para construir la tendencia histórica de tu escoria.</p><div class="meta"><label>Fecha y hora<input id="sampleDate" type="datetime-local"></label><label>Turno<input id="sampleShift" placeholder="Ej. Día / Noche"></label><label>Identificación<input id="sampleId" placeholder="Ej. Muestra 001"></label><label>Temperatura real (°C)<input id="sampleTemp" type="number" placeholder="Opcional"></label></div><div class="meta"><label style="grid-column:1/-1">Observación<input id="sampleNote" placeholder="Condición del horno, colada, laboratorio…"></label></div><div class="btns"><button class="action" onclick="saveSample()">Guardar muestra</button></div><div id="saveMsg" class="muted" style="margin-top:8px"></div></div>
+</section>
+<section class="pane" id="props">
+ <div class="card"><h2>Propiedades estimadas de la escoria</h2><p class="muted">Ingresa la temperatura real del baño para evaluar el delta térmico y las propiedades eléctricas.</p>
+ <div class="field"><label>Temperatura real de escoria<small>°C · dato de operación</small></label><input id="opTemp" type="number" placeholder="Ej. 1550" oninput="renderProps()"></div><div class="field"><label>Temperatura de liquidus<small>°C · calculada con tu modelo Excel</small></label><input id="liqManual" type="text" readonly value="Automática"></div>
+ <div class="field"><label>Hierro total (Fe)<small>% · se toma del análisis químico</small></label><input id="feMirror" type="text" readonly></div>
+ <div class="grid" style="margin-top:12px"><div class="metric"><span>Temperatura de liquidus</span><strong id="liquidus">Pendiente</strong><em id="liqSub">Modelo por calibrar</em></div><div class="metric"><span>Delta térmico</span><strong id="delta">—</strong><em>Temperatura real − liquidus</em></div><div class="metric"><span>Resistividad eléctrica</span><strong id="resistivity">—</strong><em id="resSub">Ω·cm (ohmios-centímetro)</em></div><div class="metric"><span>Viscosidad dinámica</span><strong id="viscosity">Pendiente</strong><em id="visSub">P (poise) · modelo Excel</em></div></div>
+ <div id="propNotice" class="notice info">Cálculos replicados de tu archivo Excel. El modelo convierte Fe total a FeO equivalente multiplicando por 1,29, tal como está definido en tu hoja. Verifica los resultados contra muestras conocidas antes de utilizarlos en decisiones de operación.</div>
+ </div>
+
+</section>
+<section class="pane" id="energy">
+ <div class="card"><h2>Consumo específico de energía</h2><p class="muted">Calcula el consumo con potencia activa y alimentación instantánea.</p>
+ <div class="field"><label>Potencia activa<small>MW</small></label><input id="powerMW" type="number" step="0.1" placeholder="Ej. 70" oninput="renderEnergy()"></div>
+ <div class="field"><label>Alimentación<small>toneladas por hora (t/h)</small></label><input id="feedRate" type="number" step="0.1" placeholder="Ej. 155" oninput="renderEnergy()"></div>
+ <div class="grid"><div class="metric"><span>Consumo específico</span><strong id="specificEnergy">—</strong><em>kWh/t</em></div><div class="metric"><span>Potencia ingresada</span><strong id="powerDisplay">—</strong><em>MW</em></div></div></div>
+ <div class="card"><h2>Estimación de corriente de línea</h2><p class="muted">Estimación trifásica en el lado de alimentación a partir de potencia activa, tensión y factor de potencia.</p>
+ <div class="field"><label>Tensión de línea<small>kV</small></label><input id="lineVoltage" type="number" step="0.1" placeholder="Ingresa tensión" oninput="renderEnergy()"></div>
+ <div class="field"><label>Factor de potencia<small>0 a 1</small></label><input id="powerFactor" type="number" step="0.01" min="0" max="1" placeholder="Ej. 0.90" oninput="renderEnergy()"></div>
+ <div class="metric" style="margin-top:10px"><span>Corriente de línea estimada</span><strong id="lineCurrent">—</strong><em>kA · estimación, no corriente de electrodos</em></div>
+ <div class="notice">La corriente calculada es una estimación eléctrica trifásica del lado de alimentación. No determina la corriente secundaria ni la corriente de electrodos del horno. Para ello se requieren datos del transformador, taps, impedancia y configuración eléctrica. No usar este cálculo como consigna de operación.</div>
+ </div>
+</section>
+<section class="pane" id="trend">
+ <div class="card"><h2>Historial y tendencias</h2><p class="muted">Cada muestra guardada alimenta la base local del celular. Los registros no se envían a ningún servidor.</p><label class="muted">Variable a visualizar<select id="trendMetric" onchange="drawTrend()"><option value="ratio">Relación SiO₂/MgO</option><option value="ni">Ni (%)</option><option value="fe">Fe (%)</option><option value="mgo">MgO (%)</option><option value="sio">SiO₂ (%)</option><option value="al">Al₂O₃ (%)</option><option value="temp">Temperatura real (°C)</option><option value="liquidus">Liquidus (°C)</option><option value="delta">Delta térmico (°C)</option><option value="viscosity">Viscosidad (P)</option><option value="resistivity">Resistividad (Ω·cm)</option></select></label><div style="margin-top:10px"><canvas id="trendCanvas" width="760" height="260"></canvas></div><div id="historyCount" class="muted" style="margin-top:8px"></div></div>
+ <div class="card"><h2>Muestras registradas</h2><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>ID</th><th>Ni</th><th>Fe</th><th>MgO</th><th>SiO₂</th><th>Al₂O₃</th><th>Si/Mg</th></tr></thead><tbody id="historyRows"></tbody></table></div><div class="btns"><button class="action" onclick="exportHistory()">Exportar respaldo CSV</button><button class="action secondary" onclick="clearHistory()">Borrar historial</button></div></div>
+</section>
+<section class="pane" id="whatif">
+ <div class="card"><h2>Simulador de escenarios</h2><p class="muted">Modifica la química en una copia independiente. No cambia el análisis actual ni guarda el escenario como muestra histórica.</p><div class="scenario-grid" id="scenarioFields"></div><div class="field"><label>Temperatura hipotética (°C)</label><input id="scTemp" type="number" placeholder="Ej. 1550"></div><div class="btns"><button class="action secondary" onclick="copyCurrentScenario()">Copiar química actual</button><button class="action" onclick="compareScenario()">Comparar escenario</button></div><div id="scenarioResult" style="margin-top:12px"></div></div>
+</section>
+</div>
+<script>
+const defs=[{id:'ni',name:'Níquel (Ni)',value:0.14},{id:'fe',name:'Hierro total (Fe)',value:13.58},{id:'mgo',name:'Óxido de magnesio (MgO)',value:23.23},{id:'sio',name:'Dióxido de silicio (SiO₂)',value:52.14},{id:'al',name:'Óxido de aluminio (Al₂O₃)',value:3.55}];
+const $=id=>document.getElementById(id);const n=id=>{let v=$(id).value.trim();return v===''?null:Number(v)};const f=(v,d=2)=>Number.isFinite(v)?v.toFixed(d):'—';
+function fields(){defs.forEach(x=>{let w=document.createElement('div');w.className='field';let l=document.createElement('label');l.textContent=x.name;let i=document.createElement('input');i.type='number';i.step='0.01';i.min='0';i.id=x.id;i.value=x.value;i.addEventListener('input',()=>{renderChem();renderProps()});w.append(l,i);$('chemFields').append(w);let sl=document.createElement('label');sl.textContent=x.name+' (%)';let si=document.createElement('input');si.type='number';si.step='.01';si.id='sc_'+x.id;si.placeholder='—';si.value=x.value;sl.append(si);$('scenarioFields').append(sl)});}
+function vals(){let o={};defs.forEach(d=>o[d.id]=n(d.id));return o}function ratio(v){return v.mgo>0&&v.sio!==null?v.sio/v.mgo:null}
+function renderChem(){let v=vals();$('ratio').textContent=f(ratio(v));$('feMirror').value=v.fe===null?'':v.fe.toFixed(2)+' %';renderProps()}
+function calcProperties(v,temp){
+ if(![v.ni,v.fe,v.mgo,v.sio,v.al,temp].every(x=>x!==null&&Number.isFinite(x))||v.mgo<=0||temp<=-273)return {liquidus:null,delta:null,viscosity:null,resistivity:null,valid:false};
+ // Replica de CALCULOS!AH: usa Fe total * 1.29 como FeO equivalente.
+ const H=v.sio/v.mgo, feO=v.fe*1.29, I=1.7,L=2.7;
+ const J=0.06*v.al+(1.79+0.03*(v.fe-12));
+ const K=0.085*v.al+(2.1+0.03*(v.fe-12));
+ const M=-2*v.al+(1466-(2*v.fe-12));
+ const N=-12*v.al+(1427-(10*(v.fe-12)));
+ const O=-12*v.al+(1420-(10*(v.fe-12)));
+ const P=-39*v.al+(1592-(20*(v.fe-12)));
+ let tl;
+ if(H<2.6){
+  let interp;
+  if(H<J) interp=((N-M)/(J-I))*(H-I)+M;
+  else if(H<=K && H>=J) interp=((O-N)/(K-J))*(H-J)+N;
+  else interp=((P-O)/(L-K))*(H-K)+O;
+  tl=329.3843165+0.9189*interp-69.01552*H-3.1842*v.mgo+1.81537*v.sio;
+ }else{
+  tl=167.573+19.4*H+6.562*v.sio+0.6215*(1370+10.82*v.sio-10.28*v.fe-10.2*v.ni-14.6*v.mgo-40.36*v.al);
+ }
+ const sum=feO+v.al+v.sio+v.mgo;
+ if(sum<=0)return {liquidus:tl,delta:temp-tl,viscosity:null,resistivity:null,valid:false};
+ const q=feO/sum,r=v.al/sum,s=v.sio/sum,t=v.mgo/sum;
+ const ac=q/71.84,ad=r/101.96,ae=s/60,af=t/40.33,den=ac+ad+ae+af;
+ const aa=ac/den,ab=af/den;
+ const exponentVis=(-0.093*(s*100))-(0.066*(t*100))-(0.041*(q*100))-(0.129*(r*100))+(0.039*H)+((2334.7*(s*100)+217.3*(t*100)-46.1*(q*100)+2147.1*(r*100)-812.2*H)/(8.314*(temp+273)));
+ const viscosity=Math.exp(exponentVis);
+ const z=Math.exp(-4.45+9.15*aa+5.34*ab);
+ const w=(1/z)*1000/100;
+ const resistivity=0.3352*w-0.1779;
+ return {liquidus:tl,delta:temp-tl,viscosity,resistivity,valid:true,feO};
+}
+function renderProps(){
+ let v=vals(),temp=n('opTemp');$('feMirror').value=v.fe===null?'':v.fe.toFixed(2)+' %';
+ if(temp===null){['liquidus','delta','resistivity','viscosity'].forEach(id=>$(id).textContent='Ingresa T°');$('liqSub').textContent='Modelo Excel';$('resSub').textContent='Según correlación Excel';$('visSub').textContent='P (poise)';$('propNotice').textContent='Ingresa la temperatura medida con termocupla para calcular las propiedades.';return}
+ let p=calcProperties(v,temp);
+ if(!p.valid){$('liquidus').textContent='—';$('delta').textContent='—';$('resistivity').textContent='—';$('viscosity').textContent='—';$('propNotice').textContent='Completa los cinco componentes y verifica que los valores sean positivos y que la temperatura sea válida.';return}
+ $('liquidus').textContent=f(p.liquidus,1)+' °C';$('liqSub').textContent='Calculado con ecuación de tu Excel';
+ $('delta').textContent=f(p.delta,1)+' °C';$('resistivity').textContent=f(p.resistivity,4);$('resSub').textContent='Ω·cm (ohmios-centímetro) · CALCULOS!AK';
+ $('viscosity').textContent=f(p.viscosity,3);$('visSub').textContent='P (poise) · CALCULOS!AJ';
+ $('propNotice').textContent='Modelo replicado de tu Excel. FeO equivalente = Fe total × 1,29. La resistividad se presenta en Ω·cm según la unidad indicada para la operación. Verifica la escala numérica contra mediciones conocidas antes de utilizarla en decisiones de operación. Estos cálculos son apoyo técnico, no consignas de operación.';
+}
+function renderEnergy(){let p=n('powerMW'),q=n('feedRate'),v=n('lineVoltage'),pf=n('powerFactor');$('powerDisplay').textContent=p===null?'—':f(p,2);$('specificEnergy').textContent=p!==null&&q!==null&&q>0?f(p*1000/q,1):'—';$('lineCurrent').textContent=p!==null&&v!==null&&v>0&&pf!==null&&pf>0&&pf<=1?f(p/(Math.sqrt(3)*v*pf),2):'—'}
+function resetChem(){defs.forEach(d=>$(d.id).value=d.value);$('opTemp').value='';renderChem()}
+function shareCurrent(){let v=vals(),t=['QUÍMICA DE ESCORIA',...defs.map(d=>d.name+': '+f(v[d.id])+' %'),'SiO₂/MgO: '+f(ratio(v))];let text=t.join('\n');if(navigator.share)navigator.share({text}).catch(()=>{});else if(navigator.clipboard)navigator.clipboard.writeText(text).then(()=>alert('Análisis copiado.'));else alert(text)}
+const KEY='cm_slag_history_21';function hist(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return []}}
+// Migra los registros compatibles de la versión 2.0 anterior.
+(function migrateOldHistory(){if(localStorage.getItem(KEY))return;try{let old=JSON.parse(localStorage.getItem('cerromatoso_slag_history_v2')||'[]');let converted=old.filter(r=>r.values&&['ni','fe','mgo','sio','al'].every(k=>r.values[k]!==undefined)).map(r=>({date:r.date,id:r.id,shift:r.shift,temp:r.temp,note:r.note,values:{ni:r.values.ni,fe:r.values.fe,mgo:r.values.mgo,sio:r.values.sio,al:r.values.al},ratio:r.ratio}));if(converted.length)localStorage.setItem(KEY,JSON.stringify(converted));}catch(e){}})();
+function saveSample(){let v=vals();if(defs.some(d=>v[d.id]===null||!Number.isFinite(v[d.id]))){$('saveMsg').textContent='Completa los cinco componentes antes de guardar.';return}let h=hist();let st=n('sampleTemp'),pr=st===null?null:calcProperties(v,st);h.push({date:$('sampleDate').value||new Date().toISOString(),id:$('sampleId').value.trim()||'Muestra '+(h.length+1),shift:$('sampleShift').value,temp:st,note:$('sampleNote').value,values:v,ratio:ratio(v),liquidus:pr?.liquidus??null,delta:pr?.delta??null,viscosity:pr?.viscosity??null,resistivity:pr?.resistivity??null});localStorage.setItem(KEY,JSON.stringify(h));$('saveMsg').textContent='Muestra guardada en este celular.';renderHistory()}
+function renderHistory(){let h=hist();$('historyCount').textContent=h.length+' muestras guardadas en este dispositivo.';$('historyRows').innerHTML=h.slice().reverse().map(r=>`<tr><td>${esc((r.date||'').replace('T',' ').slice(0,16))}</td><td>${esc(r.id)}</td><td>${f(r.values.ni)}</td><td>${f(r.values.fe)}</td><td>${f(r.values.mgo)}</td><td>${f(r.values.sio)}</td><td>${f(r.values.al)}</td><td>${f(r.ratio)}</td></tr>`).join('')||'<tr><td colspan="8" class="empty">Todavía no hay muestras guardadas.</td></tr>';drawTrend()}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function drawTrend(){let c=$('trendCanvas'),ctx=c.getContext('2d'),h=hist(),key=$('trendMetric').value;ctx.clearRect(0,0,c.width,c.height);let ps=h.map((r,i)=>({x:i,y:key==='ratio'?r.ratio:key==='temp'?r.temp:key==='liquidus'?r.liquidus:key==='delta'?r.delta:key==='viscosity'?r.viscosity:key==='resistivity'?r.resistivity:r.values?.[key]})).filter(p=>p.y!==null&&p.y!==undefined&&Number.isFinite(Number(p.y)));if(!ps.length){ctx.fillStyle='#637786';ctx.font='16px system-ui';ctx.fillText('Guarda muestras para visualizar la tendencia',35,125);return}let ys=ps.map(p=>Number(p.y)),lo=Math.min(...ys),hi=Math.max(...ys),sp=hi-lo||1,L=55,R=20,T=20,B=35,W=c.width-L-R,H=c.height-T-B;ctx.strokeStyle='#dce5ea';ctx.lineWidth=1;for(let j=0;j<5;j++){let y=T+j*H/4;ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(c.width-R,y);ctx.stroke();ctx.fillStyle='#637786';ctx.font='11px system-ui';ctx.fillText(f(hi-(hi-lo)*j/4,2),5,y+4)}ctx.strokeStyle='#176b87';ctx.lineWidth=3;ctx.beginPath();ps.forEach((p,i)=>{let x=L+(ps.length===1?W/2:i*W/(ps.length-1)),y=T+H-(Number(p.y)-lo)/sp*H;i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke();ps.forEach((p,i)=>{let x=L+(ps.length===1?W/2:i*W/(ps.length-1)),y=T+H-(Number(p.y)-lo)/sp*H;ctx.fillStyle='#f4b942';ctx.beginPath();ctx.arc(x,y,4,0,7);ctx.fill()})}
+function exportHistory(){let h=hist();if(!h.length){alert('No hay muestras para exportar.');return}let rows=[['Fecha','ID','Turno','Ni','Fe','MgO','SiO2','Al2O3','SiO2/MgO','Temperatura','Liquidus','Delta','Viscosidad_P','Resistividad_ohmio_cm','Observacion'],...h.map(r=>[r.date,r.id,r.shift,r.values.ni,r.values.fe,r.values.mgo,r.values.sio,r.values.al,r.ratio,r.temp,r.liquidus,r.delta,r.viscosity,r.resistivity,r.note])];let csv=rows.map(row=>row.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(';')).join('\n');let a=document.createElement('a'),url=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));a.href=url;a.download='historial_escorias.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+function clearHistory(){if(confirm('¿Borrar todas las muestras guardadas? Esta acción no se puede deshacer.')){localStorage.removeItem(KEY);renderHistory()}}
+function copyCurrentScenario(){let v=vals();defs.forEach(d=>$('sc_'+d.id).value=v[d.id]??'');$('scTemp').value=n('opTemp')??''}
+function compareScenario(){let v={};defs.forEach(d=>v[d.id]=n('sc_'+d.id));let r=ratio(v),t=n('scTemp'),cur=vals(),r0=ratio(cur),sp=t===null?null:calcProperties(v,t),cp=n('opTemp')===null?null:calcProperties(cur,n('opTemp'));let out=`<div class="grid"><div class="metric"><span>Relación escenario SiO₂/MgO</span><strong>${f(r)}</strong></div><div class="metric"><span>Relación actual SiO₂/MgO</span><strong>${f(r0)}</strong></div><div class="metric"><span>Cambio de relación</span><strong>${r!==null&&r0!==null?((r-r0)>=0?'+':'')+f(r-r0):'—'}</strong></div><div class="metric"><span>Temperatura escenario</span><strong>${t===null?'—':f(t)+' °C'}</strong></div></div>${sp&&sp.valid?`<div class="grid" style="margin-top:10px"><div class="metric"><span>Liquidus escenario</span><strong>${f(sp.liquidus,1)} °C</strong></div><div class="metric"><span>Delta escenario</span><strong>${f(sp.delta,1)} °C</strong></div><div class="metric"><span>Viscosidad escenario</span><strong>${f(sp.viscosity,3)} P</strong></div><div class="metric"><span>Resistividad escenario</span><strong>${f(sp.resistivity,4)} Ω·cm</strong></div></div>`:''}<div class="notice info">El escenario usa las mismas ecuaciones de tu Excel. Es una simulación hipotética; no representa una recomendación automática de cambio operativo.</div>`;$('scenarioResult').innerHTML=out}
+function setDate(){let d=new Date();$('sampleDate').value=new Date(d-d.getTimezoneOffset()*60000).toISOString().slice(0,16)}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('active',p.id===b.dataset.tab));if(b.dataset.tab==='trend')renderHistory()}));
+fields();setDate();renderChem();renderHistory();renderEnergy();setTimeout(()=>{$("splash")?.classList.add("hide");setTimeout(()=>{$("splash")?.remove()},250)},2000);
+</script></body></html>
